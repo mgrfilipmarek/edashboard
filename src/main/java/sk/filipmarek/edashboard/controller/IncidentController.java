@@ -1,42 +1,51 @@
 package sk.filipmarek.edashboard.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import sk.filipmarek.edashboard.model.IncidentModel;
-import sk.filipmarek.edashboard.repository.IncidentRepository;
+import sk.filipmarek.edashboard.model.Incident;
+import sk.filipmarek.edashboard.model.IncidentType;
+import sk.filipmarek.edashboard.model.SeverityLevel;
 import sk.filipmarek.edashboard.service.IncidentService;
+
+import java.time.LocalDateTime;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/incident")
+@RequestMapping("/api/v1/incident")
 public class IncidentController {
 
     private final IncidentService incidentService;
 
     @PostMapping
-    public void save(@RequestBody IncidentModel incident) {
-        incidentService.insertIncident(incident);
+    public ResponseEntity<Incident> save(@RequestBody Incident incident) {
+        return ResponseEntity.ok(incidentService.insertIncident(incident));
     }
-
-    /*@GetMapping("/{id}")
-    public IncidentModel findById(@PathVariable String id) {
-        // TODO: orElse
-        return incidentService.findById(id).orElse(null);
-    }*/
-
-    @GetMapping
-    public Iterable<IncidentModel> findAll() {
-        return incidentService.getAllIncidents();
-    }
-
-    /*@DeleteMapping("/{id}")
-    public void delete(@PathVariable String id) {
-        incidentService.deleteById(id);
-    }*/
 
     @PutMapping
-    public void update(@RequestBody IncidentModel incident) {
-        incidentService.updateIncident(incident);
+    public ResponseEntity<Incident> update(@RequestBody Incident incident) {
+        return ResponseEntity.ok(incidentService.updateIncident(incident));
+    }
+
+    @GetMapping
+    public ResponseEntity<Page<Incident>> findAll(
+            Pageable pageable,
+            @RequestParam(required = false) IncidentType incidentType,
+            @RequestParam(required = false) Double locationLatitude,
+            @RequestParam(required = false) Double locationLongitude,
+            @RequestParam(required = false) LocalDateTime timestamp,
+            @RequestParam(required = false) SeverityLevel severityLevel
+    ) {
+        return ResponseEntity.ok(incidentService.getAllIncidentsWithFilter(pageable, incidentType, locationLongitude, locationLatitude, timestamp, severityLevel));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable String id) {
+        incidentService.deleteIncident(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
 }

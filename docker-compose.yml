@@ -1,0 +1,35 @@
+version: '3'
+services:
+  elasticsearch:
+    image: elasticsearch:8.13.0
+    ports:
+      - 9200:9200
+      - 9300:9300
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+    healthcheck:
+      test: curl -s http://localhost:9200 >/dev/null || exit 1
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    networks:
+      - mynet
+
+#  apiserver:
+#    build: .
+#    environment:
+#      - SPRING_ELASTICSEARCH_URIS=elasticsearch:9200
+#    ports:
+#      - 8080:8080
+#    depends_on:
+#      elasticsearch:
+#        condition: service_healthy
+#    expose:
+#      - 8080
+#    networks:
+#      - mynet
+
+networks:
+  mynet:
+    driver: bridge

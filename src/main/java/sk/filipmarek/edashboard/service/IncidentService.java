@@ -1,25 +1,25 @@
 package sk.filipmarek.edashboard.service;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import sk.filipmarek.edashboard.model.IncidentModel;
-import sk.filipmarek.edashboard.repository.IncidentRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import sk.filipmarek.edashboard.model.Incident;
+import sk.filipmarek.edashboard.model.IncidentType;
+import sk.filipmarek.edashboard.model.SeverityLevel;
 
-@Service
-@RequiredArgsConstructor
-public class IncidentService {
+import java.time.LocalDateTime;
+import java.util.List;
 
-    private final IncidentRepository incidentRepository;
+public interface IncidentService {
 
-    public Iterable<IncidentModel> getAllIncidents(){
-        return incidentRepository.findAll();
-    }
+    List<Incident> getAllFromDB();
 
-    public void insertIncident(IncidentModel incident) {
-        incidentRepository.save(incident);
-    }
+    List<Incident> getAllElastic();
 
-    public IncidentModel updateIncident(IncidentModel incident) {
-        return incidentRepository.save(incident);
-    }
+    Page<Incident> getAllIncidentsWithFilter(Pageable pageable, IncidentType incidentType, Double locationLongitude, Double locationLatitude, LocalDateTime timestamp, SeverityLevel severityLevel);
+
+    Incident insertIncident(Incident incident);
+
+    Incident updateIncident(Incident incident);
+
+    void deleteIncident(String id);
 }
